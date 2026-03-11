@@ -28,7 +28,7 @@ Spring AI의 사용
 1. 다양한 AI를 추상화 시켜 쓰는 PSA 로 계층을 만들어 앱은 이 PSA활용.
 PSA써서 다양한 AI 교체활용 LLM과의 통합.
 
-2. 운영의 진화 Cloud Native &Observabilty
+2. 운영의 진화 Cloud Native & Observability
 배포시 Could 에 베포하는데 이거 쉽고 편하게 해줌.
 서버를 모니터링 해야함. bottle neck 파악 등등. 성능 측정, tracing 해야함.
 이런건 별도의 모듈로 구성 연결하는게 AOP. 비즈니스 로직 안건들고 제공할 수 있게함.

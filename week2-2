@@ -1,0 +1,76 @@
+<<Dependency Injection>> (의존성 주입)
+**Spring container 중요**
+
+의존성?ㅏ
+
+ClassA가 Class의 메소드를 쓴다? 그럼 의존성있는거임.
+
+class petOwner가 있음. animal을 지정함
+private AnimalType animal
+생성자가
+this.animal=new Dog();
+
+이 코드는 petOwner가 Dog에 의존함. 이 의존관계를 new로 직접 연결해준 형태임.
+만약에 Dog 말고 Cat 키우려면 new로 다시 Cat을 직접 지정해야함.
+소스코드를 직접 변경해야하는 문제가 발생.
+이 경우가 Tight coupling의 문제. 테스트하기가 힘듦.
+
+
+이래서 Dependency Injection의 개념이 나옴.
+Framework가 의존성을 부여함
+기존에는 new로 의존성을 생성했지만, 이제는 "외부" 프레임워크가 객체를 주입.
+Spring container가 있음. 이놈이 의존성을 주입함. 이걸 "Bean" 이라고 부름
+
+
+동작의 원리.
+Spring container가 있음 이놈이 Bean을 생성, 이 Bean과 Bean사이의 객체의 의존성을 부여.
+그럼 이놈들이 다하면 난 configuration (설정)을 해줘야함. 설정에 따라 객체생성, 의존성부여함.
+이거 도와주는게 Spring boot임.
+
+
+아까 그 개 고양이에서
+Spring container가
+cat BEan, dog Bean, petOwner Bean을 만듬.
+PetOwner의 생성자가 불릴떄, animal을 호출(이전에는 직접 Dog or Cat 호출했었지만.) 여기에 생성해둔 dog,cat을 호출시켜주는거임.
+animal을 호출할떄, configuration에 따라 호출.
+
+
+Di를 활용한 예시:
+testing을 사용하는 예시.
+소프트웨어가 작으면 그냥 해도됨. 복잡하면 자동화된 test logic이 필요해짐.
+
+Controller<-MyService->Database
+   |
+   <--Mocked Service
+
+   원래는 MyService를 만들어서 test 해야하지만. <MockedService 정해진 input,output을 설정한 가짜를 만듬.
+
+   Mocked주입해서 잘 되면, 진짜인 MyService을 만들어 주입.
+   포인트는 Controller의 변경없이 테스트용 Service,진짜 서비르를 넣다뺐다 할 수 있는거임.
+
+
+ 이 장점.
+ 1. 결합도 낮추기.
+ 2. 테스트 용이
+ 3. 설정 쉬움.
+
+ Spring container의 역할이 중요하다. Bean들을 생성 관리 의존성 부여
+ Spring container 설정하는 법!
+ 1. XML
+ 2. annotation
+ 3. Java Config
+
+
+XMl의 경우. <Bean> 태그의 사용 id의 부여의 활용 직관적임. 좀 옛날방식
+Annotation의 경우. @component의 사용(Bean만들어 줘) @AutoWired(이거 주입해줘)
+JAVA Class의 경우 @Bean의 사용(return하는 객체를 Bean으로 만들어줘
+
+Spring container가 bean을 만들 때 , id도 만듦으로 app에서 그 id로 활용가능
+Singleton, Prototype의 개념 나중에 확인 반드시
+default값은 Singleton임.
+동기화할때 Singleton은 문제발생 여부가 있음.
+Since singleton beans are shared across multiple threads,
+they should not have mutable member variables to ensure thread safety
+Singleton은 읽기만 하면 문제없음 근데 계속 읽고 변경되고 이러면 문제 발생할 수도 있음.
+
+
