@@ -43,7 +43,7 @@ Controller<-MyService->Database
    |
    <--Mocked Service
 
-   원래는 MyService를 만들어서 test 해야하지만. <MockedService 정해진 input,output을 설정한 가짜를 만듬.
+   원래는 MyService를 만들어서 test 해야하지만. MockedService 정해진 input,output을 설정한 가짜를 만듬.
 
    Mocked주입해서 잘 되면, 진짜인 MyService을 만들어 주입.
    포인트는 Controller의 변경없이 테스트용 Service,진짜 서비르를 넣다뺐다 할 수 있는거임.

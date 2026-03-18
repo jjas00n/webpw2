@@ -1,0 +1,90 @@
+contorller <-> model <-> view
+    |                       |
+    write                 view
+
+controller 가 사용자 요청 처리하고 view가 view 생성
+
+model은 두 사이에 공유하는 공간. 동시에 controller가 쓰고 view가 읽는 경우는 없어야 함.(상호배제)
+view는 model 의 데이터(BEAN을)렌더링 함. (JSP, JSON, TimeLeaf)
+
+client가 있고 Sever가 있으면 view를 어디서 생성할까?
+서버에서? 아니면 데이터만 서버에서 전달하고 client에서 생성할까?
+현재 TimeLeaf는 Server단위에서 
+JSP는 client에서 
+
+일단은 Server 단위에서 view를 생성하는 것 을 배울거임.
+
+Server는 할일이 많기에 가능하면 Client애서 하는것을 권장
+
+Client요청-> Controller->Service->repo->DB 일반적인 구성
+이걸 Model에 저장(Bean) 
+이제 결과를 View에서 요청(값,에러 등등)해서 Client또는 Sever에 제어권 넘겨서 view 생성
+
+**Dispatcher Servlet** 중요한듯
+1. Client-> Dispatcher
+2. Dispatcher-> HandlerMaping 이 URL로 왔는데 누가 어떤 controller가 처리해야함? 하고 물어봄. 그거 답변 다시 전달
+3. Dispatcher-> Controller 
+4. Controller-> Service
+5. Service-> repository
+6. repo-> DB
+7. 다시 Controller
+8. Controller-> Model
+9. 이제 어떤 view를 그려야할지 결정됨
+10. View가 ViewResolver에 물어봄. 여기서 VIew에 이름만 전달함. 왜냐하면 나중에 TimeLeaf, Jsp등등으로 변결할 수 도 있기에 이름만 넘김.
+11. 이 이름을 바탕으로 관련 경로를 알려줌. ViewREsolver->Dispatcher
+12. Dispatcher가 VIew 로 권한 넘겨서 화면 구성.
+
+우리가 작업해야하는건 Controller->model->Veiw
+나머지는 Spring이 알아서 함.
+
+Dispatcher는 사용자 요청을 받아서 해당하는 Controller에 위임하는 역할
+**WebapplicationContext** 라는 Spring Container를 생성 이건 dispatcherServlet마다 하나씩 생성
+/sales, /market 등등 하나씩 계속 생성
+
+HandlerMapping 어떤 controller의 어떤 method를 쓸지 알려줌 
+@RequestMapping, @GetMapping, @PostMapping 등등
+RequestMappingHandlerMapping 이 class name
+
+ViewResolver은 이름가지고 어
+View는 physical 파일로 vie 그냥 ppt참고해서 마저 적기
+
+spring container 는 두가지 종류가있음.
+Parent, Child
+
+먼저 Server(Tomcat)이 setup시 WebApplicationInitializer을 찾음.
+WebApplicationInitializer는 getRootConfigClasses와 getServiceConfigClasses를 가지고 있음. 거기서 그것들을 각각 호출(이름을)
+우리가 설정할 것이 이것들임. 
+
+Root WebApplicationContext는 모든 자식 서블릿에서 접근가능(Bean들 말하는 거임)
+
+Servlet WebApplicationContext는 자식으로써 Root의 Bean들에 접근 가능. 하지만 반대는 안됨.
+
+
+@ComponentScan - 해당 패키지들의 Component를 찾아서 그것들을 Bean으로 등록함. ppt의 경우, service,repository를 스캔함으로 해당 Bean들을 자동 등록
+
+다른 방법은 @Bean을 일일히 달아서 하는 방법도 있음
+
+**@EnableWepMvc** Spring에서 필요한 Mvc에 관련한 기능들 알아서
+
+
+
+Model 
+attribute라고 등록하는게 잇음
+이건 Key-value쌍으로 저장함.
+
+
+Controller
+Bean으로 등록하기에 @Controller로 해야함
+view를 리턴함
+@RestController는 view를 리턴 안하고 Json파일로 리턴
+
+
+RequestMapping 
+어떤 URL을 보고 처리할지.
+
+
+**@ReuestParam 등등 ppt보고 각각의 @이 어떤 역할을 하는지 알아야 할듯**
+
+View Tech TimeLeaf 쓸거임
+Key를 주면 ${이름} 이러면 value값 반환
+
