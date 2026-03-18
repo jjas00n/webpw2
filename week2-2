@@ -74,3 +74,4 @@ they should not have mutable member variables to ensure thread safety
 Singleton은 읽기만 하면 문제없음 근데 계속 읽고 변경되고 이러면 문제 발생할 수도 있음.
 
 
+qqwe
