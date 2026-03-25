@@ -1,0 +1,54 @@
+<사용자가 폼 입력시 뭐 하는지>
+
+1. 사용자가 입력한 form 데이터를 어떻게 전달할거냐
+2. 파라미터들을 어떨게 JAVA 갹체로 변환할 것이냐 (객체 바인딩) <-스프링이 알아 함
+3. 바인딩 이후 검증, 사용자의 실수 혹은 고의 혹은 에러를 검증 @Vaild하면 스프링이 알아함
+4. 에러가 있다? 에러 메세지를 View가 출력함 (Timeleaf th;error) 
+5. 잘못 입력한, 기존에 입력한거 버퍼림
+6. 예외상황이 발생시 별도 처리 
+
+사용자의 입력->name:laptop, price:999 -> HTTP에 담김(GET,POST사용) -> 
+
+
+GET의 경우
+? 이후 name=LAPTOPcategory=Eletornics
+url에 사용자가 입력한 파라미터를 뒤에 담아주는 방식. url에 입력값이 다 보임
+그러므로 민감한 정보는 담을 수 없음
+검색이나 필터에는 유용함
+url을 북마크 해서 다음에도 동일한 결과 열람 가능
+
+
+POST의 경우
+파라미터가 BODY부분에 들어감
+이것도 확인은 가능
+하지만 HTTPS를 사용하게 되면 중간에 HTTP-TCP사이에 SSL이 있어 암호화 가능
+보안이 뛰어남
+앞으로는 POST쓸거임
+
+
+<Form 제출부터 저장까기의 과정>
+
+Browser->DIspatcher
+브라우저가 Form입력하고 제출함. 
+Form data가 POST로 날라감
+
+DIspatcher->Controller->
+입력된 데이터를 바인딩함. DTO(Data transfer object)
+
+Controller->Binder
+Data Binder가 바인딩
+
+**DTO** 내가 만들어야 하고 중요한듯?
+
+Data Binder -> Vaildator
+바인딩된거 검증
+Binding result 반환
+
+검증해보니까 에러있음?(hasError)
+있으면 다시 입력 요청
+기존에 입력값도 유지(버퍼)
+없으면? SErvice/REpository에 DTO 전달
+
+DTO를 entity로 반환 후 데베에 저장
+
+
