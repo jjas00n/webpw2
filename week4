@@ -52,3 +52,84 @@ Binding result 반환
 DTO를 entity로 반환 후 데베에 저장
 
 
+사용자가 입력한 request parameter를 Java 객체 필드에 메칭하는거> 데이터 바인더
+이거 Spring이 알아함(이름을 기반으로)
+
+
+수동의 경우 name:Laptop, Price:999 
+@RequestParam 을 사용 
+하나씩 매칭
+내가 직접 Getter만들어서 수동으로 저장
+
+자동의 경우(Spring)
+PRoducut form에 @ModelAttribute 하면 Product Form만들어서 알아서 
+ex) nre Product form
+name param = ~~~
+category = ~~~
+.
+.
+.
+
+*나중에 MODEL에 저장한거 VIew가 가져가 씀*
+
+
+
+바인딩 다했다? 그럼검증 시작
+제약을 명시해서 알려줌.
+@NotBlank(message = "categroy is required" )
+@Size~~
+등등 PPT에 다양한 @있음 나중에 확인
+
+
+<혼동발생 할 수 있는 부분>
+
+@NotNull vs @NotEmpty vs @NotBlank
+
+null    x   x   x
+""      0   x   x
+"  "    0   0   x
+"a"     0   0   0
+
+** @ModelAttribute 데이터 바인딩    @Vaild 데이터 검증  hasError 에러검증**
+
+
+<DTO 왜씀?>
+
+Entity vs DTO
+
+Entity는 DB에 저장,읽기에 ID 필요
+Entity는 createAt(생성일자) 필요
+
+
+<검증하는 부분>
+
+
+** 3-4 PPT에서 왜 final을 쓰는가? 에대해 좀 자세히 이해하고 있기 그냥 이 페이지 전체 이해**
+공유자원에 대한 상호 배제가 중요 키워드인듯
+
+
+인자1,2 form, result
+각각 바인딩된거, 검증된거 널는 곳임
+이후 모델에 두가지를 담아서 저장
+나중에 view가 가져다 씀 둘 다 볼 수 있음
+
+<VIew에서>
+form, result를 볼 수 있음
+Thymeleaf 에서 
+
+기존에 사용자가 입력한 값을 노출시킴
+
+<데이터 버퍼링>
+에러발생시 이미 입력했던 값 유지
+
+Exception Handling
+그냥 PPT 5 페이지에잘 나와있음 그거 참고
+
+
+
+1. 커스텀 Exception
+Productnotfound 를 만들검임.
+RuntimeException을 상속함 
+일단 모르겠으니까 이것도 PPT 보기 5-1
+
+123
