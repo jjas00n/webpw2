@@ -1,0 +1,141 @@
+<JPA, Hibernate>
+
+전에는 JAVA 제공JDBC썼음.
+이젠 JPA Hibernate쓸거임.
+
+JPA는 인터페이스. 그거 구현한게 Hiibernate
+
+APP은 JPA를 이용하는데 Entity Manager를 사용해서
+
+DB에 C.R.U.D를 함. 이거 하는게 Entity Manager.
+
+이거 두개 쓰려고 하니까 어려움.
+쉽게 할 수 있게 하는게 Sping Data JPA
+Repository라는 인터페이스 있음
+
+Spring Data JPA도 결국 JPA 쓰니까 결국 알아야함
+
+JDBC: SQL 사용해서 실제 프로그래밍 하는거. 결과도 수동처리해줘야함. 코드가 많아짐
+JPA: 인터페이스만 가진 스펙임. 그걸 구현한게 Hibernate. 표준임. ORM(Object .Relation. Mapping) 다양한 기능. Vender-independent
+Hibernate: JPA 구현한 구현체 JPQL씀(SQl 자동 생성) 
+Spring Data JPA: JPA기반 Spring Module임. Repository라는 인터페이스 CRUD같은 코드도 알아 해줌 Spring boot와 함꼐 씀
+
+
+<<JPA>>
+ORM-Standard JPA
+
+<ORM>
+하나의 객체가 하나의 테이블에 메핑이 됨.(ORM)
+그냥 겍체 지향적으로 프로그래밍하면 ORM에 의해 자동적으로 테이블 메핑 해줌
+@Entity 클래스를 잘 쓰자.
+
+JPA: jakarta.persistence
+
+<Entity Class>
+****** Java class인데 DB테이블에 메핑되는********.
+
+메핑이 자동으로 되기는 하지만, 어떤 방식으로 메핑될지는 우리가 작성해야함
+그 정보들은 @를 사용해서 전달함.
+@Entity(엔티티 클래스임): 그럼 테이블에 메핑해야지.
+@Table(name="product"): 그럼 그 이름으로 메핑해야지.
+@Getter
+@Setter
+.
+.
+
+public class Product{
+    @Column(name="id") : 그럼 이 컬럼으로 메핑해야지
+    @Id: 이거 primary key로 하는구나
+    @GeneratedValue(strategy=GeneratedType.IDENTITY): 나중에 설명 써놓기 놓쳐서 못들음
+    @NoArgsConstuctor: 인자없는 것으로 생성
+}
+
+
+@entity는 필수 
+@Table은 선택 클래스 이름이랑 테이블이름이 다를 경우 지정하기 위해 사용(근데 그냥 쓰는게 명확하고 좋음)
+
+@Column(name="id"
+length=100, Nullable = false) 등의 설정도 넣기 필요하면 자세한건 PPT참고
+
+<Primary Key Rules>
+Uniquely identifies each row in a table
+• Must contain a unique value
+• Cannot contain NULL values
+• Mapped with @Id annotation
+
+@id 이 필트가 기본키임
+@GeneratedValue 기본키 어떻게 만들거임? 하는 전략임 
+(유일하게 저장을 해줘야 알 수 있음) IDENTITY-> AUTO_INCREMENT를 씀. 저장을 할 때, ID값이 자동으로 1씩 증가함. 저장을 해야지 키값이 저장이되는 방식
+SEQUENCE 다음에 사용할 기본키값
+AUTO 
+UUID 랜덤난수 바탕으로 
+    ^
+    |
+PPT에 자세히 나와있으니까 그거 참고해
+
+
+@LOB 큰 객체임
+
+App->(create)->EntityManagerFactory(app당 하나만)->(transaction시작되면 produce)->EntityManager(transaction1)->EntityManager(transaction2)
+->(SQL실행)->DataBase  
+DB특. 완정 commit 되거나 Rollback되어야 함.이걸 하려면 어디까지가 트렌젝션 시작 끝임을 알아야 함.
+@transaction 이때 씀
+    ****AOP**** 
+우리 눈에는 이런 코드들이 안보임->AOP덕이다.
+
+해당 Transaction을 보고 10분을 이야기 할 수 있어야 함.
+
+
+EntityManager는 영속성 Context를 가짐. (캐슁가능/퍼포먼스향상)
+
+<Persist>
+IDENTITY를 제외ㅣ한 나머지의 경우는 캐쉬에 저장한 후 나중에 FLush/commit 할 때 저장함
+IDENTITY는 케쉬에 안넣고 바로 DB에 저장함. 그리고 바로 키값을 알게 됨. 
+
+<find>
+먼저 캐쉬에 있는거 봄. 없다? 그러면 select하고 DB에서
+
+<merge>
+없데이트 할 떄
+flush나 commit할 때 함.
+
+<remove>
+flush나 commit할 때 함.
+
+<createQuery>
+PPT확인
+
+<flush>
+sql실행해서 캐쉬걸 DB에 반영
+
+
+@Repository 
+실제 DB에 CRUD실행하는 계층
+@PersistenceContext 의존성 주입받ㅇ므(DI) (EntityManager)
+
+PPT확인하면 이후 CRUD의 작업이 이루어짐
+
+
+<PersistenceContext>
+1. 1st-Level Cache 
+2. Dirty Checking(변경감지) 동기화
+3. Write-Behind(SQL 지연실행) 성능향상을 위해
+
+EntityManager는 영속성 컨텍스트(PersistenceContext)를 가짐.
+
+1st-level cache: same PK → no extra SQL
+Dirty Checking: field change → auto UPDATE
+Write-behind: SQL batched until flush/commit
+clear() empties the Persistence Context
+
+그림을 머리속에 기억을 해야함.
+
+
+Entity의 LifeCycle
+1. New(Transient) 상태 DB와 연관없음. EntityManager와도 관계 없음
+2. Managed(Persistent) 저장을 한 순간 EntityManager에 의해 관리가 되는 상태
+3-1. Detached 더 이상 관리 안한다 merge 하면 다시 관리 상태로 변경
+3-2. Removed 삭제 예정인거 아직 삭제는 안됨.
+
+Persistent, Removed만 In Persistence Context
+New, Detached는 Not In Persistence Context
