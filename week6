@@ -1,0 +1,40 @@
+Entity API=CRUD
+
+Controller->service->Repository->EntityManager->DB(CRUD)
+사용자요청/비즈니스 로직/데이터엑세스/
+
+@Transactional -> 하나의 단위로 처리할게 하나라도 실패하면 다 취소
+
+persist하면  managed 되고, flush 하면 DB에 갱신.
+단, IDENTITY의 경우는 제외.
+
+Find() PersistenceContext에 있음? 그럼 SQL없이 그냥 가져옴. 없으면 SQL써서 DB접근
+Find하면 managed상태
+findAll() 은 
+
+    TypedQuery<Product> query = entityManager.createQuery("SELECT p FROM Product p ORDER BY p.id ASC", Product.class);
+    이 문장은 JQPL임. 이건 Entity기반(SQL은 테이블기반)
+    Entity name이나 field를 사용한거임.
+    getResultList로 해당 결과값을 받아옴.
+
+
+UPDATE하는 방법은 Dirty Checking의방법(recommended) 
+혹은 Merge 의 방법
+
+Delete의 경우 
+먼저 find하고 managed상태로 만든 후 remove. 트렌젝션끝나고 DELETE
+
+
+<<JPQL>>
+Entity 기반의 query임.
+
+PPt보면 알 수 있음. 엔티티이름으로 부르면서 SQL을 실행. 컬럼대신 field의 이름으로 부름.
+
+JPQL은 alias=별칭을 씀.
+
+UPDATE DELETE의 특징= DB에 바로 작성해버림.(PersistenceContext우회)
+
+<Repository 계층>
+
+entityManager가 제공하는 API를 쓰기에 SQL안씀.
+
