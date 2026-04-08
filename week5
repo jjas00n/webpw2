@@ -86,7 +86,7 @@ DB특. 완정 commit 되거나 Rollback되어야 함.이걸 하려면 어디까�
 해당 Transaction을 보고 10분을 이야기 할 수 있어야 함.
 
 
-EntityManager는 영속성 Context를 가짐. (캐슁가능/퍼포먼스향상)
+**EntityManager는 영속성 Context를 가짐. (캐슁가능/퍼포먼스향상)
 
 <Persist>
 IDENTITY를 제외ㅣ한 나머지의 경우는 캐쉬에 저장한 후 나중에 FLush/commit 할 때 저장함
@@ -123,19 +123,54 @@ PPT확인하면 이후 CRUD의 작업이 이루어짐
 
 EntityManager는 영속성 컨텍스트(PersistenceContext)를 가짐.
 
-1st-level cache: same PK → no extra SQL
-Dirty Checking: field change → auto UPDATE
-Write-behind: SQL batched until flush/commit
-clear() empties the Persistence Context
+1st-level cache: same PK → no extra SQL // key값검색하고 없으면 DB에서가져옴 캐쉬에 있으면 그냥 가져옴(SQL없)
+Dirty Checking: field change → auto UPDATE // 조회했음. Managed, 변경. <-이거 감지함 자동으로 업데이트 우리가 업데이트 호출 할 필요없
+Write-behind: SQL batched until flush/commit // SQL모았다가 나중에 Flush하면 
+clear() empties the Persistence Context // 
 
 그림을 머리속에 기억을 해야함.
 
 
 Entity의 LifeCycle
-1. New(Transient) 상태 DB와 연관없음. EntityManager와도 관계 없음
-2. Managed(Persistent) 저장을 한 순간 EntityManager에 의해 관리가 되는 상태
-3-1. Detached 더 이상 관리 안한다 merge 하면 다시 관리 상태로 변경
-3-2. Removed 삭제 예정인거 아직 삭제는 안됨.
+1. New(Transient) 상태 DB와 연관없음. EntityManager와도 관계 없음 // 아직 DB에 저장안해서 id값도 NULL임 값을 바꿔도 DB는 모름(Dirty Checking 없음) **
+2. Managed(Persistent) 저장을 한 순간 EntityManager에 의해 관리가 되는 상태 // 이제 JPA가 관리를 함. DB에도 저장되어있으니까 id도 있음 주로 persist/find로 이 상태가 됨, 
+3-1. Detached 더 이상 관리 안한다 merge 하면 다시 관리 상태로 변경 // 트렌젝션끝남? 관리를 안하는 상태. 하지만 merge 하면 다시 managed 상태가 될 수 있음
+3-2. Removed 삭제 예정인거 아직 삭제는 안됨. // remove하면 이 상태. 다만, DB에서 삭제된 상태는 아님.
+
 
 Persistent, Removed만 In Persistence Context
 New, Detached는 Not In Persistence Context
+해당 사항은 PPT에서 확인.
+
+
+단위테스트 
+
+@Transactional                              // 각 테스트는 독립 트랜잭션 (테스트 후 롤백)
+@ExtendWith(SpringExtension.class)          // JUnit 5에서 Spring 빈(Bean) 주입 및 컨테이너 기능을 쓸 수 있게 연결
+@ContextConfiguration(classes = DbConfig.class)   // 테스트를 실행할 때 사용할 설정(Configuration)지정
+
+@Test //트렌젝션 단위로 실행
+각각의 테스트 이후에는 원위치 Rollback됨.
+해당 내용이 이해가 안되먄 PPT에있는 Entity LifeCycle부분 확인.
+
+2페이지는 persist로 managed 상태로 변한 모습.
+예외가 있음. Key를 생성시 IDENTITY전략을 사용한 경우는 바로 DB에 저장을 함. 
+왜냐? 해당 전략은 Primary key를 DB가 관리하기에 저장을 해야 id를 알 수 있음. 
+
+3페이지의 경우 find로 managed상태가 됨.
+
+먼저persist로 managed가 되었지만, clear로 Detached상태가 되었지만,
+다시 find로 managed상태가 됨.
+
+4페이지의 경우는 
+persist-Detach-setname
+managed-Detached
+이경우 Detach이후에 setname으로 변경하였기에 DB에 반영이 안됨.
+이후에 다시 이름을 바꾸고 merge를 한 상황.
+이 경우 Detach상태에서 바꾼거랑 DB에 저장된 값을 합치는거임. 이러면 Detached기준으로 합쳐짐.
+
+5페이지의 경우 remove상태가 된 상태.
+아직 DB에는 살아있지만, flush하면 실제로 삭제가 됨.
+
+
+
