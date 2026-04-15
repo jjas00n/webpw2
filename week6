@@ -38,3 +38,22 @@ UPDATE DELETE의 특징= DB에 바로 작성해버림.(PersistenceContext우회)
 
 entityManager가 제공하는 API를 쓰기에 SQL안씀.
 
+
+<Transactional>
+read only 설정시-> Dirty Checkingd않마. 그래서 성능이 좋음
+근데 설정해도 이후에 CUD 등의 변경해야하면 override해서 씀.
+@Transaction 쓰면 알아서 begin, commit해줌. runtime시에 그래서 우린 굳이 안적음
+
+
+<실제 process는 동영상을 보시길.>
+
+한가지 이야기 하자면, config작업파일에서 설정을 하는데, 
+DB관련해서 Spring contianer가 두개임. root에는 공유하는 bean들. 자식들에는 web관련.
+DBconfig는 공유하는 bean들을 설정하는 파일임.
+
+이거 시험 나올듯?
+**hbm2ddl.auto-> 이거 테이블 자동으로 생성할거임? 물어보는거임**
+ppt에  자세히 나와있음
+
+
+

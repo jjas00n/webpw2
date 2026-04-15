@@ -1,1 +1,100 @@
-    
+<EntityRelationship>
+@ManyToOne
+이런 @ 알려주면, 일대다구나 하고 이해하고 나중에 join컬러 만들고 foriegn키 만들떄도 쓰겠구나
+이런식으로 객체지향적으로 만 하면 알아ㄱ서 join해준다.
+
+Java의 경우는 주소지로 전달, DB의 경우는 forign 키로 찾아간다.
+JAVA는 getname으로, DB는 join연산의 조합으로
+
+JPA가 알아서 join하고 북치고 장구치고 함.
+
+DB연결의 다영한 예시, 일대다,다대다,다대일,다대다 등등
+일대다의 경우, 양방향? 그런데, 테이블은 아님. 외래키는 하나임. 중요한 차이는 객체쪽에서는 단이든 양이든 다 가능. 그런데 테이블은 외래키가 하나여야함.
+그러므로 외래키가 어디에 있는지 알려줘야함. MappedBy라는걸 써서.
+일대일 관계 cascade는 주로 all로 줄임. product를 삭제할 떄, product detail도 삭제함. 이런것처럼.
+다대다의 관계 product와 tag의 관계. 다수의 테그가 붙을 수 있기에 반대도 가능하기에. 그런데 Join Table로 연결하게 되어있음. 외래키만으로 부족하기 때문.
+
+엔티티의 속성. 
+<CascadeType>
+부모연산이 자식에게 전파되는 성질.
+부모 자식은 일대다의 관계.
+만약에 카테고리를 저장을 한다? 그럼 자식의product도 함꼐 저장할 것이냐?
+그렇다면 cascade속성을 부여하라. 
+em.persist(catagory) 저장하면 자식도 저장하겠다.
+em.remove(catagory) 삭제하면 자식도 삭제하겠다.
+5가지가 있음. 이거 일단 다 알자.
+
+ALL = All 5 in one.   NEVER cascade=ALL on @ManyToOne / @ManyToMany!
+
+좋은예시. 
+Category class 에서 
+많은 product가 있음.
+catagory 1: product: many
+여기에 all쓰면 카테고리 저장하면 해당 product도 저장됨! 
+
+않좋은 예시
+product:many catagory:1
+
+catagory에 remove를 줌. 
+
+
+<FetchType>
+조회하는거임.
+두가지가 있음 Eager/Lazy
+
+카테고리 읽을때, 프로덕트 읽는게 졸을까?
+EAGER 같이 읽음.
+Lazy 필요시 읽겠다.
+
+Eager는 가능하면 쓰지말자. 성능이 아주 별로다. 규모가 클떄 특히
+Lazy의 단점은 ⚠ LazyInitException if accessed after tx closes 트렌젝션 닫혔는데 읽을때 오류가 뜸/
+
+default는 하나인경우 EAGER임. MANY 쪽인경우 default는 Lazy
+
+EAGER의 경우 findbyid? 걸린거 카테고리+프로덕트 다 읽어들임. 성능의 저하. 
+LAZY의 경우 findbyid? 걸린거 카테고리만 읽어들임. 실제 프로덕트 조회할 때 제품 가지고 옴.
+
+기본적으로 LAZY써라. 오류 발생시 join fetch로 해결하라.
+
+
+
+카테고리:프로덕트의 경우는 양방향으로 연결 그냥 PPt 보기.
+ManyToONe이거 중요함.
+
+Unidirectional**
+@Entity잊지 말기.
+Product에서 Category라는 필드를 톨해 Category라는 테이브렝 접근함.
+
+Java의 경우는 new로 만들고, macbook.Category=electorinics;로 연결.
+macbook.getCategory.getName() 로 확인.
+
+PPt의 경우 cascade를 안쓰고 for loop로 저장하는 모습.
+이때 반드시 카테고리를 먼저 저장해야함. 왜? 실제로 id가 있어야지 외래키가 저장됨.
+
+
+OneToMany이것도 중요함.
+
+Bidriectional**
+
+MappeBy를 지정해줘야함. 왜? foriegn키 하나로 연결하기에 어디에 외래키가 있는지 알려줘야함.
+그게 mappedBy="Category" 이거 한거임.
+
+단방향이든 양방향이든 DB스키마의 변화는 없다.
+
+Helper메서드가 있음.
+양방향인데도 연결을 잊는 경우가 있음(하나는 이었는데 나머지 안이음).
+
+
+Category가 있음 product도. Lazy는 필요할 떄 읽음. 
+Category읽어도 product아직 안읽음.
+Transaction시작되면 entityManager만들고 PersistenceContext시작.
+Category읽었음. 아직 product안읽음. 근데 Transaction종료됨. EntityManager사라짐.
+그 다음에 getProducts() 근데 아직 없잖아? 그러니까 DB에서 읽어야지? 근데 entityManager없음!
+거기서→ LazyInitializationException! 
+그럼 어캄? 방법은 두가지.
+
+1. Transaction안에서 처리하기. catagory도 읽고 product도 일고.
+2. Join FETCH. 말 그래로. 그냥  Categoryㅎ랑 product id 곂치는거 합쳐서 다 읽기 
+
+OneTOOne-> 그냥 이해해.
+ManyToMany의 경우 Join Table을 하나 만들어서 거기서 각각을 연결. 많이 쓰이진 않음.
