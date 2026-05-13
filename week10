@@ -1,0 +1,42 @@
+restcontroller쓸건데 이떄도 클라 리퀘받고 
+@RestController에감. 마찬가지로 SEervice-Repo로 감.
+그 결과는 객체로 되어있는데, 이걸 Json으로 만듦. 이걸 Jackson이 함.
+이걸 HTTP REsponse Body에 널어서 데이터를 반ㄴ환한ㅁ.
+그럼.
+Jackson으로 Json으로 만든다는 사실.
+
+<핵심 에노테이션>
+@ResponseBody & @RestController.
+객체를 어ㄷ디 대입할 지 에 따라서 해당 어노테이션을 잘 활용함.
+
+@PathBariable 
+ResponseEntity라는 "클래스"
+
+1. @ResponseBody-> 메서드의 반환값을 응답 메세지의 BOdy에 넣는것.
+
+기존 Controller와 ResponseBody라는 두 어놈테이션의 조합은. 
+귀찮음. 각각 ResponseBody를 호출해야하기 때믄.
+RestController는 다름. 저 둘을 하나의 RestController로 만ㄷ,ㄹ어주기에ㅡ 
+또한 View가 서버가 아닌 클라가 만듦. 서버는 data만 만듦. 서버의 부담을 줄임.
+
+ppt에 해당 내용을 담은 그림이 있음. 그거 보는게 더 좋을듯.
+
+@PathVariable Url에 퐇마되 값을 해당 파라미터에 바인딩해줌. 
+
+ResponseEntity 이건 뭐냐?
+REsponse Message기ㅏ 있음. status line, Header lines, Blank line, Entity Body/
+Status, Header, Body가 있어야 함. 이 세가지를 담는 클래스가 ResponseEntity임.
+여기에 원하는 정보를 대입하면 클라한테 전달되는 메세지가 만들어짐.
+
+이거 쓰는 방법 3가지임.
+1. 생성자 방식. 일단 new로 객체로 만듦. 이것의 인자로 넘길 수 있음.
+new ResponseEntity<>(body, header, HttpStatus.CREATED) 이런식으로.
+if (user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);   // 404
+return new ResponseEntity<>(user, HttpStatus.OK);  // 200 + JSON 바디
+
+2. 정적 팩토리 방식. ResponseEntity.ok(body) // REponseEntity.notFound()
+3. .status.header.body(채인드 콜 방식) 
+근데 주류는 2번방식임.
+
+jackson이름  자주 나오는데 이거 좀 나올듯.
+

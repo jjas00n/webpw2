@@ -1,0 +1,64 @@
+spring boot는 뭐나?
+spring 프레임워크를 빠르게 시작하게 하는 도구임.
+opinionated->의견 적극반영
+대학에서 교수가 강의할 떄, 전에는 PPT없었음. 보통 분필에 판서.
+그러면 시험 공부한다? 노트필기가 중요함.
+그런데 노트필기 개판하는거 보다 잘하는사람 필기 보는게 더 좋겠지
+Spring 설정이나 라이브러리 호환이나 이런거 내가 하는거 보다 잘하는사람(Spring boot)가 좋음
+
+새 프로젝트 만들때마다 설정 하루종일하느거 안해도 되겠지. ->최소한의 설정
+버전 충돌없이 라이브러리 사용가능. 버전명시 없이 ->의존성 간소화
+Tomcat? 이런거 앱 안에 내장해서 별도 설치 X -> 내장서버
+
+4.0버전 기준으로 학습함.
+
+핵심!. 
+1. Auto Configuration
+프로젝트 생성할 떄마다 설정 또 복붙하고 뭐 번거로움
+Boot는 Auto Configuration이여서 
+Spring-webmvc있네? ->아 개발자가 웹 개발하는구나? 그럼 DispatcherServlet 자동 등록하고 설정해줘야지
+Mysql있네?-> DataSource 설정해줘야지
+App의 ClassPath 스캔함-> 해당 Bean들을 (조건부에 따라) 등록해줌.(Spring Container에 BEan 생성)
+그럼 그 조건부가 뭐냐? DB쓰는거 봤는데, 이미 개발자가 수동으로 DB만든게 있음. 그러면 덮어씌우지 않고 존중함.
+
+@SpringBootApplication이라는 에노테이션의 역할?
+= @SpringBootConfiguration + @EnableAutoConfiguration + @ComponentScan
+@EnableAutoConfiguration-> Auto Configuration을 활성화!
+
+~.xml 파일들. 설정 파일들 이런것들 만들 필요가 없다.
+
+Auto Configuration 동작원리
+1.JAR 추가
+pom.xml에 의존성을 추가함. spring-boot-starter-data.jpa+mysql-container
+2. CLASSPATH 스캔
+어떤 JAR가 있는지 확인. DataSource.class, Driver.class등이 있구나
+3. 조건평가 
+@Conditional로 조건 채크. Onclass, OnMissingBean(이거없나? 없으면 굳), OnProperty 등록승인
+4. Bean 자동 등록
+DataSource + EntityManager + Transaction 자동 등록 완료
+
+**🔑  핵심 원칙: 개발자가 Bean을 등록하지 않았을 때만 (= @ConditionalOnMissingBean) 자동 등록 → 항상 개발자 설정이 우선**
+
+
+@Conditional 조건평가
+이해하면 좋을듯? 
+DataSourceAutoConfiguration이라는 클래스가 잇음. ppt보면 조건이 3개임. 이조건들을 만족시켜야지 자동 설정 기능이 작동함.
+
+
+Spring Boot Starters
+이전엔 각각의 버전들의 충돌이 있을까봐 전전긍긍
+Boot의경우는 버전 지정을 안함. 왜냐하면, <Parent> 부분에서 버전을 다 명시해놓음
+
+
+내장서버
+단점은 패키징한 Jar 파일이 커거 무거워짐.
+예를들어 이거 두개 실행하면 DB도 두개 서버도 두개 등등임.
+
+
+Actuator가 있음.
+DevOps-> 개발과 운영
+운영도 중요함 Application property설정 신경쓰기
+
+
+
+Boot앱 만들기는 동영상 강의에 잘 나옴.
